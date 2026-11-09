@@ -1,0 +1,56 @@
+# =====================================
+# Visual Studio
+# =====================================
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# =====================================
+# .NET / ASP.NET Core
+# =====================================
+**/bin/
+**/obj/
+*.pdb
+*.cache
+
+# Local development configuration
+**/appsettings.Development.json
+
+# =====================================
+# React / Node.js
+# =====================================
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/.vite/
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# =====================================
+# Environment variables / Secrets
+# =====================================
+.env
+.env.*
+!.env.example
+
+# =====================================
+# Logs
+# =====================================
+*.log
+logs/
+
+# =====================================
+# Operating System
+# =====================================
+.DS_Store
+Thumbs.db
+Desktop.ini
