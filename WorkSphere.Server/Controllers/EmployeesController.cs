@@ -30,7 +30,7 @@ public class EmployeesController : ControllerBase
 
     // GET /api/employees
     [Authorize]
-    [HttpGet]
+    [HttpGet] // this is controller
     public async Task<IActionResult> GetEmployees()
     {
         var isUserAdmin = User.IsAdmin();
