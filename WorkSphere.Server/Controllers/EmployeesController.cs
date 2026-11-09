@@ -243,4 +243,17 @@ public class EmployeesController : ControllerBase
         Salary = e.Salary,
         CreatedAt = e.CreatedAt
     };
+
+    private static void Test()
+    {
+        try
+        {
+            Console.WriteLine("New branch");
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
 }
