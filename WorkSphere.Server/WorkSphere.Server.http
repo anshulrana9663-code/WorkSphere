@@ -1,0 +1,6 @@
+@WorkSphere.Server_HostAddress = http://localhost:5069
+
+GET {{WorkSphere.Server_HostAddress}}/api/health
+Accept: application/json
+
+###

@@ -1,0 +1,78 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: Launch API (.NET)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-server",
+      "program": "${workspaceFolder}/WorkSphere.Server/bin/Debug/net10.0/WorkSphere.Server.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/WorkSphere.Server",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5069"
+      }
+    },
+    {
+      "name": "Backend: Attach to .NET Process",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
+      "name": "Frontend: Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/WorkSphere.Client",
+      "sourceMaps": true
+    },
+    {
+      "name": "Frontend: Launch Edge",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/WorkSphere.Client",
+      "sourceMaps": true
+    },
+    {
+      "name": "Frontend: Attach to Browser",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "urlFilter": "http://localhost:5173/*",
+      "webRoot": "${workspaceFolder}/WorkSphere.Client",
+      "sourceMaps": true
+    },
+    {
+      "name": "Frontend: Vite Dev Server (Terminal)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/WorkSphere.Client"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack: Backend (.NET) + Frontend (Chrome)",
+      "configurations": [
+        "Backend: Launch API (.NET)",
+        "Frontend: Launch Chrome"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "Full Stack: Backend (.NET) + Frontend (Edge)",
+      "configurations": [
+        "Backend: Launch API (.NET)",
+        "Frontend: Launch Edge"
+      ],
+      "stopAll": true
+    }
+  ]
+}
