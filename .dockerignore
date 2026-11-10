@@ -1,0 +1,39 @@
+# Git
+.git/
+.gitignore
+
+# Visual Studio
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Test results
+**/TestResults/
+
+# Node.js
+**/node_modules/
+**/dist/
+**/build/
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Logs
+*.log
+
+# Documentation
+README.md
+
+# OS files
+.DS_Store
+Thumbs.db

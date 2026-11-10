@@ -7,6 +7,7 @@
     <SpaRoot>..\WorkSphere.Client\</SpaRoot>
     <SpaProxyServerUrl>http://localhost:5173</SpaProxyServerUrl>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+    <UserSecretsId>c9aa0ac0-9948-4dd5-b4fc-29f17ef559d5</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
