@@ -125,7 +125,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173"
             , "https://localhost:5173"
-            , "https://worksphere-88e5.onrender.com")
+            , "https://work-sphere-eta.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // Essential for HttpOnly cookies and credentials
