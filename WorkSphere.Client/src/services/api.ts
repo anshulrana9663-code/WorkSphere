@@ -3,6 +3,8 @@
  * JWT tokens are kept strictly in HttpOnly cookies and never stored or handled in localStorage.
  */
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
   return match ? decodeURIComponent(match[3]) : null;
@@ -27,7 +29,7 @@ export async function apiFetch<T = unknown>(
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
     headers,
     credentials: 'include', // Send and receive HttpOnly session cookies
