@@ -179,7 +179,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps || !_environment.IsDevelopment(),
-            SameSite = SameSiteMode.none,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
             Path = "/"
         };
@@ -196,7 +196,7 @@ public class AuthController : ControllerBase
             {
                 HttpOnly = false, // Client JavaScript reads this to pass in X-XSRF-TOKEN header
                 Secure = Request.IsHttps || !_environment.IsDevelopment(),
-                SameSite = SameSiteMode.none,
+                SameSite = SameSiteMode.None,
                 Path = "/"
             };
 
