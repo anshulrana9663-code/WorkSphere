@@ -20,6 +20,7 @@ export interface ApiTaskAttachment {
   employeeId?: number;
   uploadedByName?: string;
   uploadedDate: string;
+  url?: string;
 }
 
 export interface ApiTask {

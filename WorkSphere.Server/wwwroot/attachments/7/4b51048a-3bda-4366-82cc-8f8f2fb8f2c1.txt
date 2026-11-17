@@ -1,0 +1,142 @@
+      ********************************  PowerShell ************************************
+ Use of this ''only to highlight
+
+ ..> What is PowerShell ?
+      PowerShell is a powerfull and versetile command line shell and scripting language.
+ 1> It has commands like command prompts but has advance features.
+ 2> You can also write script in ISE.
+ 3> It gives data in object not in simple text.
+ 4> It has feature Pipeline in that you can use one command to input as a other command.
+ 5> It is also secure malicious script will not run.
+ 6> PowerShell core it can we used for with Mac, linux and windows
+ 7> You can use powershell to automate and manage the microsoft products like azure exchage and others also.
+ 8> Remote Management you can also use powershell script in remote system.
+
+ ..> Use 'get-host' to check the version of the powershell and use 'update-help' to update the all the  helping scripts in the powershell. 
+ 
+ ..> Use 'get-help get-command' to get the description of the get-command.
+
+ ..> Use 'get-command' to get the all command to get the all commands of specific version.
+ '(get-command).count'
+
+ ..> Filter the commands from the all commands : you can use 'get-command *service*' it will bring all  the commands which has service in them. Later for the description you can use get-help name of the  command. 
+
+ ..> there are other ways also by which you can get the commands like 
+ get command -Module ModuleName to the all the commands inside the Module
+ get command -ParameterName NameOfParameter to get the commands which has Specific parameter name.
+
+ ..> 'get help get service -examples' = To get the example of service command in PowerShell.
+
+ ..> 'get help get service -detailed' = To get the detail of any service.
+ ..> 'c:// get service "With*" ' = to get the service which has with in the starting.
+ ..> 'c:// get service -DisplayName "MyScript"' = to get the service which has MyScript in the   starting.
+
+ ..> ISE in PowerShell = Integrated Script Enviroment is a powershell script editor write and to do  other task on powershell scripts.
+ To Enable Integrated Script Enviroment = Use 'powershell_ise.exe'
+
+ ..> To declare variable use $NameOfVariable and print any thing use Write-Host "Print Message"
+ -eq means equals to equal in PowerShell.
+
+ for eg: $ProcessName = Get-Process  -Name notepad
+
+if($ProcessName -eq 'notepad')
+{
+Write-Host "Done"
+}
+else
+{
+Write-Host "Part"
+}
+
+
+ ..> Cmdlets and functions in PowerShell : Cmdlets are the program which is complied in the .Net   language and it cannot be changed or alter and fucntions are written in powershell and it uses the   cmdlets of the power it can we modified.
+
+ Example of function : function Func_Name 
+ {
+ Get-Service
+ }
+ now you can use this Func_Name in command-Line Shell.
+
+ ..> Parameters type in PowerShell : when you use get-help get-service it shows different type of parameters so there are may types of parameter in power shell 
+ 1> Optional and common parameters : which are covered by square brackets are this type of pararmeters
+ 2> Mandatory parameters : which are not convered by square brackets are known as mandatory
+ 3> posotional parameters : option position value is more than zero when you check with help.
+
+ ..> Get-NetIPAddress to get system IP address.
+ ..> to get the all parameter name in a command use 
+  c:// (get-command get-service).paramter.value| select name
+
+ ..> Alias in powerShell: Use 'get-alias' to get all the alias in the powershell.
+ You can also get the alias name of any one command like 'get-alias -definition get-service' = it will  return the alias name of get-service command.
+ You can also add a alias for any command.
+
+ ..> PowerShell Drives= unlike in cmd it can only acces few drives like and c d and others which are  made by user but in powershell you can access drives as well as registery enviroment and many more 
+ To get the all drives in Powershell use = 'get-psdrive'
+ 'dir' command is used to list out all folders and files in a directory.
+
+ ..> '-ne' sign means no in PowerShell.
+
+ ..> ConvertTo-SecureString : it is used to convert a string to secure string in PowerShell and to convert a sercure string to encrypted string use ConvertFrom-SecrueString for eg:
+	
+$MyString="Hello"
+
+$SecString=ConvertTo-SecureString "$MyString" -AsPlainText -Force 
+
+Write-Host "$SecString"
+
+ConvertFrom-SecureString $SecString
+
+Write-Host $SecString
+
+..> $GivenInput = Read-Host : Read-Host is used to read the input from the powerShell window.
+
+ ..> datatypes in powershell : 1> Pre-Define 2> User define 3> Enviromental : They store information  about operating system.
+
+ To get the all pre define variables use 'get-variable' like $Error , $Null , $True
+ $ Error = variable stores information about each and every error came in PowerShell.
+
+ ..> To get the datatype of the variable use : Variable Name | Get-Member = it will give the datatype  and also all the methods and properties it has.
+ Note:  to do pipeing that is giving output of one command to another is known as pipeing and to do  this the source and destination datatype should be same.
+
+ ..> Variable scopes : there are two variable scopes number 1> local variable which is present in only in their local script and global variables are present in in an entire Session. To define global variables use : $global:Name='Hello' and to print it use write-Host.
+
+ ..> Array in PowerShell => in array also you dont have to define the datatype it will understand automatically to the give value. To know any variable is array or not use 
+ $variableName.getType(). And to define array : $array=
+
+ for eg: $arry = 'Anshul','Aksh','Aman'
+
+ $arry.GetType()
+
+ $arry[1] = to get the value of the array at the specific index.
+
+ and to add any value in the array use 
+
+ $arry += ,'Kaj'
+
+ ..> How pipeing works in PowerShell : pipeing it takes output of one cmd  and give that output as a input to the another commad and second command checks the type of input by gettype() and if any of its parameter matches the type of request and it accepts pipeing then it will take and give result respectivelly otherwise it will give error.
+ For eg : To write every process in cSV file use :Get-Process | Export-Csv "D:\PowerShellTest.csv"
+ also you can use file data to give to get process  
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+  

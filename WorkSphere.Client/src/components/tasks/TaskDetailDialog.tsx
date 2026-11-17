@@ -12,6 +12,7 @@ import {
   PaperclipIcon,
   SendIcon,
   TrashIcon,
+  ArrowUpRightIcon,
 } from '../common/Icons';
 
 // ---------------------------------------------------------------------------
@@ -254,10 +255,16 @@ function AttachmentsTab({
   attachments,
   onAdd,
   onRemove,
+  onOpen,
+  error,
+  onClearError,
 }: {
   attachments: TaskAttachment[];
   onAdd: (file: File) => void;
   onRemove: (id: string) => void;
+  onOpen: (att: TaskAttachment) => void;
+  error?: string | null;
+  onClearError?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -295,6 +302,26 @@ function AttachmentsTab({
         />
       </div>
 
+      {/* Backend Error Alert */}
+      {error && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">
+          <div className="flex items-center gap-2 min-w-0">
+            <AlertCircleIcon size={16} className="text-rose-500 shrink-0" />
+            <span className="truncate">{error}</span>
+          </div>
+          {onClearError && (
+            <button
+              type="button"
+              onClick={onClearError}
+              className="text-rose-600 hover:text-rose-800 p-0.5 rounded cursor-pointer shrink-0 ml-2"
+              aria-label="Dismiss error"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Attachment list */}
       {attachments.length === 0 ? (
         <div className="py-12 text-center rounded-xl border border-dashed border-slate-200">
@@ -318,7 +345,15 @@ function AttachmentsTab({
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{att.name}</p>
+                  <button
+                    type="button"
+                    onClick={() => onOpen(att)}
+                    title={`Open ${att.name} in a new tab`}
+                    className="text-sm font-semibold text-slate-800 hover:text-indigo-600 hover:underline truncate text-left cursor-pointer transition-colors flex items-center gap-1.5 max-w-full group/btn"
+                  >
+                    <span className="truncate">{att.name}</span>
+                    <ArrowUpRightIcon size={13} className="text-slate-400 group-hover/btn:text-indigo-600 shrink-0 opacity-0 group-hover/btn:opacity-100 group-hover:opacity-100 transition-opacity" />
+                  </button>
                   <p className="text-[11px] text-slate-400 mt-0.5">
                     {att.size} · uploaded by {att.uploadedBy} · {formatRelativeTime(att.uploadedAt)}
                   </p>
@@ -328,6 +363,17 @@ function AttachmentsTab({
                 <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ring-1 ${typeStyle.badge}`}>
                   {att.type}
                 </span>
+
+                {/* Open in new tab button */}
+                <button
+                  type="button"
+                  onClick={() => onOpen(att)}
+                  title={`Open ${att.name} in a new tab`}
+                  aria-label={`Open ${att.name} in a new tab`}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                >
+                  <ArrowUpRightIcon size={14} />
+                </button>
 
                 {/* Remove */}
                 <button
@@ -472,6 +518,7 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
   const [isBlocking, setIsBlocking] = useState<boolean>(false);
   const [blockInput, setBlockInput] = useState<string>('');
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
 
   const rawId = task ? parseInt(task.id.replace('WS-', ''), 10) : NaN;
 
@@ -484,6 +531,7 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
     setIsBlocking(false);
     setBlockInput('');
     setStatusError(null);
+    setAttachmentError(null);
 
     if (!isNaN(rawId)) {
       taskService.getById(rawId).then((apiTask) => {
@@ -538,6 +586,7 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
                 type: typeMap[ext] ?? 'Other',
                 uploadedBy: a.uploadedByName || 'Team Member',
                 uploadedAt: a.uploadedDate,
+                url: a.url,
               };
             })
           );
@@ -620,6 +669,7 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
 
   // ── Attachment handlers ──
   async function handleAddAttachment(file: File) {
+    setAttachmentError(null);
     if (!isNaN(rawId)) {
       try {
         const added = await taskService.uploadAttachment(rawId, file);
@@ -653,11 +703,15 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
           type: typeMap[ext] ?? 'Other',
           uploadedBy: added.uploadedByName || user?.name || 'You',
           uploadedAt: added.uploadedDate,
+          url: added.url || URL.createObjectURL(file),
         };
         setAttachments((prev) => [...prev, newAtt]);
         return;
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to upload attachment via API', err);
+        const msg = err instanceof Error ? err.message : 'Failed to upload attachment.';
+        setAttachmentError(msg);
+        return;
       }
     }
 
@@ -678,20 +732,34 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
       type: typeMap[ext] ?? 'Other',
       uploadedBy: user?.name || 'You',
       uploadedAt: new Date().toISOString(),
+      url: URL.createObjectURL(file),
     };
     setAttachments((prev) => [...prev, newAtt]);
   }
 
   async function handleRemoveAttachment(id: string) {
+    setAttachmentError(null);
     const attId = parseInt(id, 10);
     if (!isNaN(rawId) && !isNaN(attId)) {
       try {
         await taskService.deleteAttachment(rawId, attId);
-      } catch (err) {
+        setAttachments((prev) => prev.filter((a) => a.id !== id));
+      } catch (err: unknown) {
         console.error('Failed to delete attachment via API', err);
+        const msg = err instanceof Error ? err.message : 'Failed to delete attachment.';
+        setAttachmentError(msg);
       }
+    } else {
+      setAttachments((prev) => prev.filter((a) => a.id !== id));
     }
-    setAttachments((prev) => prev.filter((a) => a.id !== id));
+  }
+
+  function handleOpenAttachment(att: TaskAttachment) {
+    if (att.url) {
+      window.open(att.url, '_blank', 'noopener,noreferrer');
+    } else {
+      setAttachmentError(`No preview URL available for "${att.name}".`);
+    }
   }
 
   async function handleStatusChangeAction(newStatus: string) {
@@ -773,6 +841,9 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
               attachments={attachments}
               onAdd={handleAddAttachment}
               onRemove={handleRemoveAttachment}
+              onOpen={handleOpenAttachment}
+              error={attachmentError}
+              onClearError={() => setAttachmentError(null)}
             />
           )}
 

@@ -5,12 +5,18 @@ interface TaskSummaryHeaderProps {
   tasks: Task[];
   activeStatusFilter: string;
   onStatusFilterChange: (status: string) => void;
+  scopeTitle?: string;
+  scopeBadge?: string;
+  scopeDescription?: string;
 }
 
 export function TaskSummaryHeader({
   tasks,
   activeStatusFilter,
   onStatusFilterChange,
+  scopeTitle,
+  scopeBadge,
+  scopeDescription,
 }: TaskSummaryHeaderProps) {
   const total = tasks.length;
   const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
@@ -67,13 +73,13 @@ export function TaskSummaryHeader({
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/20 mb-2">
             <TasksIcon size={14} />
-            <span>Assigned to Alex Morgan</span>
+            <span>{scopeBadge || 'Assigned to Alex Morgan'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            My Tasks Backlog
+            {scopeTitle || 'My Tasks Backlog'}
           </h1>
           <p className="mt-1 text-sm text-slate-500 max-w-xl">
-            Track, prioritize, and manage all work items directly assigned to your profile across active workspace modules.
+            {scopeDescription || 'Track, prioritize, and manage all work items directly assigned to your profile across active workspace modules.'}
           </p>
         </div>
 

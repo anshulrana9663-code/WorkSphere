@@ -210,7 +210,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps || !_environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
+            SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
             Path = "/"
         };
 

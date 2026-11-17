@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import Dashboard from './Dashboard';
 import { ChevronDownIcon } from '../components/common/Icons';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 export default function DashboardPage() {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const [healthStatus, setHealthStatus] = useState<{
+    const [healthStatus, setHealthStatus] = useState<{
     success: boolean;
     data?: unknown;
     message?: string;
@@ -14,7 +16,7 @@ export default function DashboardPage() {
   const checkBackendHealth = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/health');
+        const response = await fetch(`${API_BASE_URL}/api/health`);
       if (response.ok) {
         const data = await response.json();
         setHealthStatus({ success: true, data });

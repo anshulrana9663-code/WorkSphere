@@ -45,5 +45,6 @@ export interface TaskAttachment {
   type: string;         // mime-category label, e.g. "PDF", "Image", "Spreadsheet"
   uploadedBy: string;
   uploadedAt: string;   // ISO string
+  url?: string;
 }
 

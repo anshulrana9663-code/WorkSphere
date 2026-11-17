@@ -40,4 +40,5 @@ public class TaskAttachmentDto
     public int? EmployeeId { get; set; }
     public string? UploadedByName { get; set; }
     public DateTime UploadedDate { get; set; }
+    public string? Url { get; set; }
 }

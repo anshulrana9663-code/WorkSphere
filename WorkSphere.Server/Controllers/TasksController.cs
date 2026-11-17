@@ -407,7 +407,8 @@ public class TasksController : ControllerBase
             UploadedByName = attachment.Employee != null
                 ? $"{attachment.Employee.FirstName} {attachment.Employee.LastName}".Trim()
                 : null,
-            UploadedDate = attachment.UploadedDate
+            UploadedDate = attachment.UploadedDate,
+            Url = attachment.Location
         });
     }
 
@@ -511,7 +512,8 @@ public class TasksController : ControllerBase
                 UploadedByName = a.Employee != null
                     ? $"{a.Employee.FirstName} {a.Employee.LastName}".Trim()
                     : null,
-                UploadedDate = a.UploadedDate
+                UploadedDate = a.UploadedDate,
+                Url = a.Location
             })
             .ToList() ?? []
     };

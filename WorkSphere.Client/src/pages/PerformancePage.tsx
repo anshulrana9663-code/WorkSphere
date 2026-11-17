@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { reviewService } from '../services/reviewService';
+import { employeeService } from '../services/employeeService';
+import type { Employee } from '../types/employee';
+import { TeamReviewsManager } from '../components/reviews/TeamReviewsManager';
 import { MOCK_PERFORMANCE_DATA } from '../mock/mockPerformanceData';
 import type { ReviewEntry } from '../mock/mockPerformanceData';
 import {
@@ -250,6 +253,15 @@ export default function PerformancePage() {
   const [liveReviews, setLiveReviews] = useState<ReviewEntry[]>([]);
   const [taskStats, setTaskStats] = useState<{ completed: number; total: number; completionRate: number } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [subordinates, setSubordinates] = useState<Employee[]>([]);
+  const [activeTab, setActiveTab] = useState<'my-performance' | 'team-reviews'>('my-performance');
+
+  useEffect(() => {
+    employeeService
+      .getSubordinates()
+      .then((data) => setSubordinates(data.filter((e) => e.isActive)))
+      .catch(() => setSubordinates([]));
+  }, []);
 
   useEffect(() => {
     async function loadPerformance() {
@@ -358,7 +370,9 @@ export default function PerformancePage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Performance &amp; Reviews</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Your performance index, historical ratings, and growth milestones.
+            {activeTab === 'team-reviews'
+              ? 'Evaluate your direct reports, record star ratings, and view feedback history.'
+              : 'Your performance index, historical ratings, and growth milestones.'}
           </p>
         </div>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-600 shadow-2xs">
@@ -367,7 +381,49 @@ export default function PerformancePage() {
         </div>
       </div>
 
-      {/* ── Section 1: Score Gauge & Breakdown (2-col) ─────────────────────── */}
+      {/* ── Subordinate Management Tab Bar (for Managers) ───────────────── */}
+      {subordinates.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200/80 w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab('my-performance')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'my-performance'
+                ? 'bg-white text-indigo-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>👤 My Performance</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('team-reviews')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'team-reviews'
+                ? 'bg-white text-indigo-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>👥 Team Evaluations</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] ${
+                activeTab === 'team-reviews'
+                  ? 'bg-indigo-50 text-indigo-700 font-bold'
+                  : 'bg-slate-200/70 text-slate-600'
+              }`}
+            >
+              {subordinates.length} direct report{subordinates.length > 1 ? 's' : ''}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* ── Content View ─────────────────────────────────────────────────── */}
+      {activeTab === 'team-reviews' && subordinates.length > 0 ? (
+        <TeamReviewsManager subordinates={subordinates} />
+      ) : (
+        <>
+          {/* ── Section 1: Score Gauge & Breakdown (2-col) ─────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Gauge card (2 cols) */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 flex flex-col items-center justify-center">
@@ -522,6 +578,8 @@ export default function PerformancePage() {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

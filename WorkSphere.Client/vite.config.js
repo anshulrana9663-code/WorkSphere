@@ -16,6 +16,11 @@ export default defineConfig({
         target: 'http://localhost:5069',
         changeOrigin: true,
         secure: false
+      },
+      '/attachments': {
+        target: 'http://localhost:5069',
+        changeOrigin: true,
+        secure: false
       }
     }
   }
