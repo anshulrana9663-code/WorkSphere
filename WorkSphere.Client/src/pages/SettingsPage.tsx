@@ -1,29 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { authService } from '../services/authService';
 import { SunIcon, MoonIcon, SettingsIcon } from '../components/common/Icons';
-
-// ─── Inline MonitorIcon (not in Icons.tsx) ───────────────────────────────────
-
-function MonitorIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
 
 // ─── Section Shell ─────────────────────────────────────────────────────────────
 
@@ -40,17 +20,19 @@ function SectionCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border bg-white p-5 sm:p-6 shadow-xs ${
-        danger ? 'border-rose-300' : 'border-slate-200/80'
+      className={`rounded-2xl border bg-white dark:bg-slate-800 p-5 sm:p-6 shadow-xs ${
+        danger
+          ? 'border-rose-300 dark:border-rose-700'
+          : 'border-slate-200/80 dark:border-slate-700/80'
       }`}
     >
-      <div className="mb-5 pb-4 border-b border-slate-100">
+      <div className="mb-5 pb-4 border-b border-slate-100 dark:border-slate-700">
         <h2
-          className={`text-sm font-semibold ${danger ? 'text-rose-600' : 'text-slate-900'}`}
+          className={`text-sm font-semibold ${danger ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}`}
         >
           {title}
         </h2>
-        {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+        {subtitle && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -59,33 +41,22 @@ function SectionCard({
 
 // ─── Theme options ────────────────────────────────────────────────────────────
 
-type ThemeOption = 'light' | 'system' | 'dark';
+type ThemeOption = 'light' | 'dark';
 
 const THEME_OPTIONS: { value: ThemeOption; label: string; icon: React.ReactNode }[] = [
   { value: 'light', label: 'Light', icon: <SunIcon size={16} /> },
-  { value: 'system', label: 'System', icon: <MonitorIcon /> },
   { value: 'dark', label: 'Dark', icon: <MoonIcon size={16} /> },
 ];
-
-function getInitialTheme(): ThemeOption {
-  try {
-    const stored = localStorage.getItem('ws-theme');
-    if (stored === 'light' || stored === 'system' || stored === 'dark') return stored;
-  } catch {
-    // ignore
-  }
-  return 'system';
-}
 
 // ─── Profile Info Row ─────────────────────────────────────────────────────────
 
 function InfoRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-3 border-b border-slate-100 last:border-0">
-      <span className="w-32 shrink-0 text-xs font-medium text-slate-500 uppercase tracking-wide">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
+      <span className="w-32 shrink-0 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </span>
-      <span className="text-sm text-slate-800">{value ?? '—'}</span>
+      <span className="text-sm text-slate-800 dark:text-slate-200">{value ?? '—'}</span>
     </div>
   );
 }
@@ -94,11 +65,11 @@ function InfoRow({ label, value }: { label: string; value?: string }) {
 
 function RoleBadge({ role }: { role: string }) {
   const map: Record<string, string> = {
-    admin: 'bg-rose-50 text-rose-700 border-rose-200',
-    manager: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    employee: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    admin: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-700',
+    manager: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700',
+    employee: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700',
   };
-  const cls = map[role.toLowerCase()] ?? 'bg-slate-100 text-slate-700 border-slate-200';
+  const cls = map[role.toLowerCase()] ?? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600';
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${cls}`}
@@ -113,29 +84,15 @@ function RoleBadge({ role }: { role: string }) {
 export default function SettingsPage() {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
-  const [theme, setTheme] = useState<ThemeOption>(getInitialTheme);
-
-  function handleThemeChange(value: ThemeOption) {
-    setTheme(value);
-    try {
-      localStorage.setItem('ws-theme', value);
-    } catch {
-      // ignore
-    }
-  }
-
+  // ── Password change state ───────────────────────────────────────────────────
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [pwdLoading, setPwdLoading] = useState(false);
   const [pwdError, setPwdError] = useState('');
   const [pwdSuccess, setPwdSuccess] = useState('');
-
-  async function handleSignOut() {
-    await logout();
-    navigate('/login');
-  }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -146,12 +103,10 @@ export default function SettingsPage() {
       setPwdError('All fields are required.');
       return;
     }
-
     if (newPassword !== confirmPassword) {
       setPwdError('New passwords do not match.');
       return;
     }
-
     if (newPassword.length < 6) {
       setPwdError('New password must be at least 6 characters.');
       return;
@@ -171,6 +126,11 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleSignOut() {
+    await logout();
+    navigate('/login');
+  }
+
   // Derive initials and avatar color
   const name: string = user?.name ?? 'Unknown User';
   const email: string = user?.email ?? '—';
@@ -188,13 +148,13 @@ export default function SettingsPage() {
     (user as Record<string, string> | null)?.avatarColor ?? 'bg-indigo-600';
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 flex items-center gap-2">
-        <SettingsIcon size={20} className="text-indigo-600" />
+        <SettingsIcon size={20} className="text-indigo-600 dark:text-indigo-400" />
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Settings</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage your account preferences</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Settings</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage your account preferences</p>
         </div>
       </div>
 
@@ -209,8 +169,8 @@ export default function SettingsPage() {
               {initials}
             </div>
             <div>
-              <p className="text-base font-semibold text-slate-900">{name}</p>
-              <p className="text-sm text-slate-500">{email}</p>
+              <p className="text-base font-semibold text-slate-900 dark:text-slate-100">{name}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{email}</p>
               {role && (
                 <span className="mt-1 inline-block">
                   <RoleBadge role={role} />
@@ -236,11 +196,11 @@ export default function SettingsPage() {
               return (
                 <button
                   key={opt.value}
-                  onClick={() => handleThemeChange(opt.value)}
+                  onClick={() => setTheme(opt.value)}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all cursor-pointer ${
                     isActive
                       ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'
+                      : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400'
                   }`}
                 >
                   <span>{opt.icon}</span>
@@ -249,53 +209,58 @@ export default function SettingsPage() {
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Theme preference is saved locally.{' '}
-            <span className="italic">Dark mode visuals coming soon.</span>
+          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
+            Theme preference is saved locally and applied instantly.
           </p>
         </SectionCard>
 
-        {/* ── Section 3: Security ────────────────────────────────────────── */}
-        <SectionCard title="Security" subtitle="Manage your password and authentication credentials">
+        {/* ── Section 3: Security ──────────────────────────────────────── */}
+        <SectionCard title="Security" subtitle="Update your account password">
           <form onSubmit={handleChangePassword} className="flex flex-col gap-4 max-w-md">
             {pwdError && (
-              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-xs text-red-600">
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-4 py-2.5 text-xs text-red-600 dark:text-red-400">
                 {pwdError}
               </div>
             )}
             {pwdSuccess && (
-              <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-2.5 text-xs text-emerald-700">
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 px-4 py-2.5 text-xs text-emerald-700 dark:text-emerald-400">
                 {pwdSuccess}
               </div>
             )}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">Current Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                Current Password
+              </label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">New Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                New Password
+              </label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">Confirm New Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                Confirm New Password
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <button
@@ -316,8 +281,8 @@ export default function SettingsPage() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-slate-800">Sign out of WorkSphere</p>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Sign out of WorkSphere</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 You'll be redirected to the login page and your session will end.
               </p>
             </div>

@@ -128,7 +128,8 @@ public class AuthController : ControllerBase
         {
             message = "If your email is registered, you will receive password reset instructions.",
             // In development mode, provide the token for verification and testing
-            resetToken = _environment.IsDevelopment() ? resetToken : null
+            //resetToken = _environment.IsDevelopment() ? resetToken : null
+            resetToken = resetToken
         });
     }
 

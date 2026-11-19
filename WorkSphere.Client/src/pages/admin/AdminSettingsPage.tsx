@@ -1,28 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { authService } from '../../services/authService';
 import { SunIcon, MoonIcon, SettingsIcon } from '../../components/common/Icons';
-
-// ─── Inline MonitorIcon ───────────────────────────────────────────────────────
-function MonitorIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
 
 // ─── Section Shell ─────────────────────────────────────────────────────────────
 function SectionCard({
@@ -38,78 +19,55 @@ function SectionCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border bg-white p-5 sm:p-6 shadow-xs ${
-        danger ? 'border-rose-300' : 'border-slate-200/80'
+      className={`rounded-2xl border bg-white dark:bg-slate-800 p-5 sm:p-6 shadow-xs ${
+        danger
+          ? 'border-rose-300 dark:border-rose-700'
+          : 'border-slate-200/80 dark:border-slate-700/80'
       }`}
     >
-      <div className="mb-5 pb-4 border-b border-slate-100">
+      <div className="mb-5 pb-4 border-b border-slate-100 dark:border-slate-700">
         <h2
-          className={`text-sm font-semibold ${danger ? 'text-rose-600' : 'text-slate-900'}`}
+          className={`text-sm font-semibold ${danger ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}`}
         >
           {title}
         </h2>
-        {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+        {subtitle && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
       </div>
       {children}
     </div>
   );
 }
 
-type ThemeOption = 'light' | 'system' | 'dark';
+type ThemeOption = 'light' | 'dark';
 
 const THEME_OPTIONS: { value: ThemeOption; label: string; icon: React.ReactNode }[] = [
   { value: 'light', label: 'Light', icon: <SunIcon size={16} /> },
-  { value: 'system', label: 'System', icon: <MonitorIcon /> },
   { value: 'dark', label: 'Dark', icon: <MoonIcon size={16} /> },
 ];
 
-function getInitialTheme(): ThemeOption {
-  try {
-    const stored = localStorage.getItem('ws-theme');
-    if (stored === 'light' || stored === 'system' || stored === 'dark') return stored;
-  } catch {
-    // ignore
-  }
-  return 'system';
-}
-
 function InfoRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-3 border-b border-slate-100 last:border-0">
-      <span className="w-36 shrink-0 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
+      <span className="w-36 shrink-0 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </span>
-      <span className="text-sm font-medium text-slate-800">{value ?? '—'}</span>
+      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{value ?? '—'}</span>
     </div>
   );
 }
 
 export default function AdminSettingsPage() {
-  const { user, role, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
-  const [theme, setTheme] = useState<ThemeOption>(getInitialTheme);
-
-  function handleThemeChange(value: ThemeOption) {
-    setTheme(value);
-    try {
-      localStorage.setItem('ws-theme', value);
-    } catch {
-      // ignore
-    }
-  }
-
+  // ── Password change state ───────────────────────────────────────────────────
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [pwdLoading, setPwdLoading] = useState(false);
   const [pwdError, setPwdError] = useState('');
   const [pwdSuccess, setPwdSuccess] = useState('');
-
-  async function handleSignOut() {
-    await logout();
-    navigate('/login');
-  }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -120,12 +78,10 @@ export default function AdminSettingsPage() {
       setPwdError('All fields are required.');
       return;
     }
-
     if (newPassword !== confirmPassword) {
       setPwdError('New passwords do not match.');
       return;
     }
-
     if (newPassword.length < 6) {
       setPwdError('New password must be at least 6 characters.');
       return;
@@ -143,6 +99,11 @@ export default function AdminSettingsPage() {
     } finally {
       setPwdLoading(false);
     }
+  }
+
+  async function handleSignOut() {
+    await logout();
+    navigate('/login');
   }
 
   const name: string = user?.name ?? 'Admin User';
@@ -164,12 +125,12 @@ export default function AdminSettingsPage() {
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-slate-900 text-white shrink-0">
+        <div className="p-2.5 rounded-xl bg-slate-900 dark:bg-slate-700 text-white shrink-0">
           <SettingsIcon size={20} />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Admin Settings</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">Admin Settings</h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Administrative account credentials and workspace governance
           </p>
         </div>
@@ -186,13 +147,13 @@ export default function AdminSettingsPage() {
               {initials}
             </div>
             <div>
-              <p className="text-base font-semibold text-slate-900">{name}</p>
-              <p className="text-sm text-slate-500">{email}</p>
+              <p className="text-base font-semibold text-slate-900 dark:text-slate-100">{name}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{email}</p>
               <div className="mt-1.5 flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-2.5 py-0.5 text-xs font-semibold">
+                <span className="inline-flex items-center rounded-full bg-slate-900 dark:bg-slate-700 text-white px-2.5 py-0.5 text-xs font-semibold">
                   Admin
                 </span>
-                <span className="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 text-xs font-semibold">
+                <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 px-2.5 py-0.5 text-xs font-semibold">
                   {isDirector ? 'Director Scope (All Employees)' : 'Manager Scope (Assigned Team)'}
                 </span>
               </div>
@@ -217,11 +178,11 @@ export default function AdminSettingsPage() {
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => handleThemeChange(opt.value)}
+                  onClick={() => setTheme(opt.value)}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all cursor-pointer ${
                     isActive
                       ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'
+                      : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400'
                   }`}
                 >
                   <span>{opt.icon}</span>
@@ -230,52 +191,58 @@ export default function AdminSettingsPage() {
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-slate-400">
+          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
             Appearance configuration is synchronized with your local browser storage.
           </p>
         </SectionCard>
 
-        {/* ── Section 3: Security ────────────────────────────────────────── */}
-        <SectionCard title="Admin Security" subtitle="Update administrative password credentials">
+        {/* ── Section 3: Security ──────────────────────────────────────── */}
+        <SectionCard title="Admin Security" subtitle="Update your administrative password">
           <form onSubmit={handleChangePassword} className="flex flex-col gap-4 max-w-md">
             {pwdError && (
-              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-xs text-red-600">
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-4 py-2.5 text-xs text-red-600 dark:text-red-400">
                 {pwdError}
               </div>
             )}
             {pwdSuccess && (
-              <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-2.5 text-xs text-emerald-700">
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 px-4 py-2.5 text-xs text-emerald-700 dark:text-emerald-400">
                 {pwdSuccess}
               </div>
             )}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">Current Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                Current Password
+              </label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">New Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                New Password
+              </label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-600">Confirm New Password</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                Confirm New Password
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/80 dark:bg-slate-700/50 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <button
@@ -296,8 +263,8 @@ export default function AdminSettingsPage() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-slate-800">Terminate Admin Session</p>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Terminate Admin Session</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Revoke current administrative token and return to authentication gateway.
               </p>
             </div>

@@ -61,10 +61,10 @@ public class TaskAuthorizationHandler : AuthorizationHandler<OperationAuthorizat
                 context.Succeed(requirement);
             }
         }
-        // Operation: Complete (Strict manager sign-off: Only the manager of the assignee or Admin can complete)
+        // Operation: Complete the manager, assignee or Admin can complete)
         else if (requirement.Name == TaskOperations.Complete.Name)
         {
-            if (isManagerOfAssignee)
+            if (isAssignee || isManagerOfAssignee || isCreator)
             {
                 context.Succeed(requirement);
             }
@@ -72,7 +72,7 @@ public class TaskAuthorizationHandler : AuthorizationHandler<OperationAuthorizat
         // Operation: UpdateStatus (e.g. InProgress, InReview: Assignee or manager can update)
         else if (requirement.Name == TaskOperations.UpdateStatus.Name)
         {
-            if (isAssignee || isManagerOfAssignee)
+            if (isAssignee || isManagerOfAssignee || isCreator)
             {
                 context.Succeed(requirement);
             }

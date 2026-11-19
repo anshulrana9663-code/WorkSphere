@@ -938,10 +938,9 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
                   Done
                 </button>
 
-                <button
-                  type="button"
+                <button type="button" 
                   onClick={() => setIsBlocking(true)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 hidden text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                     currentStatus === 'Blocked'
                       ? 'bg-purple-600 text-white shadow-2xs'
                       : 'bg-white border border-slate-200 text-slate-700 hover:bg-purple-50 hover:text-purple-700'

@@ -13,10 +13,10 @@ export function NavItem({ item, isActive, onClick, isCollapsed = false }: NavIte
 
   const badgeStyles =
     item.badgeVariant === 'warning'
-      ? 'bg-amber-100 text-amber-800'
+      ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
       : item.badgeVariant === 'primary'
-      ? 'bg-indigo-100 text-indigo-700'
-      : 'bg-slate-100 text-slate-700';
+      ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
+      : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
 
   const dotStyles =
     item.badgeVariant === 'warning'
@@ -38,8 +38,8 @@ export function NavItem({ item, isActive, onClick, isCollapsed = false }: NavIte
           : 'justify-between px-3.5 py-2.5'
       } ${
         isActive
-          ? 'bg-indigo-50/90 text-indigo-700 font-semibold shadow-xs ring-1 ring-indigo-500/20'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 font-medium'
+          ? 'bg-indigo-50/90 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold shadow-xs ring-1 ring-indigo-500/20'
+          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 font-medium'
       }`}
     >
       {isActive && !isCollapsed && (
@@ -54,8 +54,8 @@ export function NavItem({ item, isActive, onClick, isCollapsed = false }: NavIte
           size={20}
           className={`shrink-0 transition-colors duration-150 ${
             isActive
-              ? 'text-indigo-600'
-              : 'text-slate-400 group-hover:text-slate-600'
+              ? 'text-indigo-600 dark:text-indigo-400'
+              : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'
           }`}
           aria-hidden="true"
         />
@@ -72,7 +72,7 @@ export function NavItem({ item, isActive, onClick, isCollapsed = false }: NavIte
 
       {item.badge !== undefined && isCollapsed && (
         <span
-          className={`absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full ring-2 ring-white ${dotStyles}`}
+          className={`absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full ring-2 ring-white dark:ring-slate-900 ${dotStyles}`}
           title={`${item.label} (${item.badge})`}
           aria-hidden="true"
         />

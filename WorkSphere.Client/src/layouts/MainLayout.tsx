@@ -42,8 +42,8 @@ export default function MainLayout() {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900 antialiased">
-      {/* Sidebar Navigation (Collapsible drawer on mobile, docked/collapsible sidebar on desktop) */}
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased">
+      {/* Sidebar Navigation */}
       <Sidebar
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
@@ -65,7 +65,7 @@ export default function MainLayout() {
         </main>
 
         {/* Compact Footer */}
-        <footer className="border-t border-slate-200/60 bg-white/50 px-4 sm:px-6 lg:px-8 py-4 text-center text-xs text-slate-600">
+        <footer className="border-t border-slate-200/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 px-4 sm:px-6 lg:px-8 py-4 text-center text-xs text-slate-600 dark:text-slate-400">
           WorkSphere Hub &bull; Enterprise Productivity &bull; {CURRENT_YEAR}
         </footer>
       </div>

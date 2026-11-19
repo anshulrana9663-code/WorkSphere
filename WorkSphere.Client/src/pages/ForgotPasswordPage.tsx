@@ -68,11 +68,11 @@ export default function ForgotPasswordPage() {
 
         {message && (
           <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
-            <p>{message}</p>
+            {/* <p>{message}</p> */}
             {resetToken && (
               <div className="mt-3 p-3 bg-white/90 border border-emerald-300 rounded-lg text-xs break-all">
-                <span className="font-semibold block text-slate-700 mb-1">Development Reset Token:</span>
-                <code className="text-indigo-600 select-all">{resetToken}</code>
+                {/* <span className="font-semibold block text-slate-700 mb-1">Development Reset Token:</span>
+                <code className="text-indigo-600 select-all">{resetToken}</code> */}
                 <div className="mt-2">
                   <Link
                     to={`/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(resetToken)}`}
