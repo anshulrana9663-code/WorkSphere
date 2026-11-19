@@ -16,7 +16,7 @@ function getInitialTheme(): Theme {
   } catch {
     // ignore
   }
-  return 'light';
+  return 'light'; 
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
