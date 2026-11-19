@@ -180,7 +180,7 @@ public class AuthService : IAuthService
         }
 
         return (true, null);
-    }
+    }  
 
     public async Task<(bool Success, string? Error)> ChangePasswordAsync(string userId, ChangePasswordRequestDto request)
     {
